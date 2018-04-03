@@ -191,7 +191,7 @@ class Transcoder(object):
         #     return
 
         # transcode the video
-         work_path = self.transcode(path, crop, meta)
+        work_path = self.transcode(path, crop, meta)
         if not work_path:
             return
 

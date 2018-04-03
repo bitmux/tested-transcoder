@@ -1,0 +1,12 @@
+[Unit]
+Description=Transcoder service
+
+[Service]
+ExecStart=/usr/bin/python /usr/local/bin/transcoder.py
+Restart=on-failure
+RestartSec=5
+StartLimitInterval=400
+StartLimitBurst=3
+
+[Install]
+WantedBy=multi-user.target

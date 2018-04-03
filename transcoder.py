@@ -37,7 +37,7 @@ class Transcoder(object):
     # directory contained the compressed outputs
     OUTPUT_DIRECTORY = TRANSCODER_ROOT + '/output'
     # standard options for the transcode-video script
-    TRANSCODE_OPTIONS = '--mkv --slow --allow-dts --allow-ac3 --find-forced add --copy-all-ac3'
+    TRANSCODE_OPTIONS = '--quick --prefer-ac3 --add-subtitle all --main-audio eng --copy-audio 1'
     # number of seconds a file must remain unmodified in the INPUT_DIRECTORY
     # before it is considered done copying. increase this value for more
     # tolerance on bad network connections.
@@ -72,24 +72,24 @@ class Transcoder(object):
         return out
 
     def mount_share(self):
-        """
-        Mount the VBox share if it's not already mounted.
-        Returns True if mounted, otherwise False.
-        """
-        out = self.execute('mount')
-        if '%s type vboxsf' % self.TRANSCODER_ROOT in out:
-            return True
+#        """
+#        Mount the VBox share if it's not already mounted.
+#        Returns True if mounted, otherwise False.
+#        """
+#        out = self.execute('mount')
+#        if '%s type vboxsf' % self.TRANSCODER_ROOT in out:
+#            return True
         # attempt to mount
-        uid, gid = os.getuid(), os.getgid()
-        command = 'sudo mount -t vboxsf -o uid=%s,gid=%s %s %s' % (
-            uid, gid, self.VBOX_SHARE_NAME, self.TRANSCODER_ROOT)
-        try:
-            self.execute(command)
-        except subprocess.CalledProcessError as ex:
-            msg = 'Unable to mount Virtual Box Share: %s' % ex.output
-            sys.stdout.write(msg)
-            sys.stdout.flush()
-            return False
+#        uid, gid = os.getuid(), os.getgid()
+#        command = 'sudo mount -t vboxsf -o uid=%s,gid=%s %s %s' % (
+#            uid, gid, self.VBOX_SHARE_NAME, self.TRANSCODER_ROOT)
+#        try:
+#            self.execute(command)
+#        except subprocess.CalledProcessError as ex:
+#            msg = 'Unable to mount Virtual Box Share: %s' % ex.output
+#            sys.stdout.write(msg)
+#            sys.stdout.flush()
+#            return False
         return True
 
     def setup_logging(self):
@@ -186,12 +186,12 @@ class Transcoder(object):
             return
 
         # determine crop dimensions
-        crop = self.detect_crop(path)
-        if not crop:
-            return
+        # crop = self.detect_crop(path)
+        # if not crop:
+        #     return
 
         # transcode the video
-        work_path = self.transcode(path, crop, meta)
+         work_path = self.transcode(path, crop, meta)
         if not work_path:
             return
 
@@ -225,7 +225,7 @@ class Transcoder(object):
         crop_re = r'[0-9]+:[0-9]+:[0-9]+:[0-9]+'
         name = os.path.basename(path)
         self.logger.info('Detecting crop for input "%s"', name)
-        command = 'detect-crop.sh --values-only "%s"' % path
+        command = 'detect-crop --values-only "%s"' % path
         try:
             out = self.execute(command)
         except subprocess.CalledProcessError as ex:
@@ -265,7 +265,7 @@ class Transcoder(object):
                 os.unlink(workpath)
 
         command_parts = [
-            'transcode-video.sh',
+            'transcode-video',
             '--crop %s' % crop,
             self.parse_audio_tracks(meta),
             self.TRANSCODE_OPTIONS,
@@ -320,11 +320,11 @@ class Transcoder(object):
             if use_stream_titles:
                 title = streams[i+1]['title']
             title = title or track['title']
-            # remove any quotes in the title so we don't mess up the command
+            # remove any quotes in the title so we don't mess up the command, also changed "," to "=" in add audio command for compatibility with new don melton scripts
             title = title.replace('"', '')
             self.logger.info('Adding audio track #%s with title: %s',
                              track['number'], title)
-            additional_tracks.append('--add-audio %s,"%s"' % (
+            additional_tracks.append('--add-audio %s="%s"' % (
                 track['number'], title.replace('"', '')))
 
         return ' '.join(additional_tracks)

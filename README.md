@@ -1,56 +1,32 @@
-#tested-transcoder
-##--- THIS IS A BETA RELEASE --
-Please post feedback on github or at http://www.tested.com/forums/general-discussion/495076-transcoder-feedback/
+# Updated transcoder service
 
-Thanks for helping us test this out! We'll have more refined instructions once we're sure the transcoder is ready for release.
+## --- THIS IS A REALLY BAD BETA ---- 
+Caveat Emptor: I am not a coder, I just hack together other peoples stuff for my own needs. I updated the transcode.py script to work with Don's latest scripts and removed the vagrant/virtualbox wrapper around Andy's python transcode script.  Finally this handles the service using systemd instead of supervisord
 
-This is a vagrant script that creates a Virtualbox virtual machine that serves as a black box for transcoding and repackaging Blu-rays and DVDs ripped using MakeMKV into iTunes quality video files suitable for streaming using Plex or XBMC. It uses Don Melton's video transcoder scripts (https://github.com/donmelton/video-transcoding-scripts) to transcode individual files, but handles a lot of the tedious stuff involved in movie transcoding for you, including adding all audio tracks, selecting the proper subtitle track for non-English dialogue in English language films (Think Greedo's conversation with Han in Star Wars), handling the movie crop, etc. 
+## So what does it do?
+The short version: This sets up a watch folder at /media/transcoder/input and will compress any video file placed in that folder down to a smaller size and spit it out to /media/transcoder/output.  At this point I know it adds all audio tracks but I do not know if the subtitle tracks are included.  I'll be tweaking it to my specific needs but don't have plans to take it any further.
 
-To rip discs, first use MakeMKV to rip only the movie, audio tracks, and subtitles you want. The title with the most chapters, and largest size is typically the one you want. I typically tell MakeMKV to grab all the English language subtitles and audio tracks, which is a generally a good strategy. You can set this as the default in View > Preferences > Language > Preferred Language. The process may take a long time, depending on your computer and the resources you give the black box.
+If you're into writing web GUI's for status and monitoring I'd love the help!
+
+I directly pulled this python script from https://github.com/andymccurdy/tested-transcoder and all credit for the script belongs to him.
+The actual video transcode is done by Handbrake-CLI, ffmpeg is also used.  All credit for the video transcode scripts belongs to https://github.com/donmelton/video-transcoding-scripts 
+
 
 ## Prerequisites
-
-* Virtualbox - https://www.virtualbox.org/wiki/Downloads
-* Vagrant - http://www.vagrantup.com/downloads
+* Ubuntu 16.04 (I used server edition)
 * Git - http://git-scm.com/downloads
 * MakeMKV - http://www.makemkv.com/download/
 
 ## Installation Instructions
-
-1. Install the prerequisites.
-2. Verify that CPU Virtualization is turned on in your BIOS. (See below for a simple test)
-3. Navigate to your Documents folder in the terminal/command line and type `git clone https://github.com/andymccurdy/tested-transcoder/`
-4. Switch to the 'tested-transcoder' folder and run `vagrant up`.
-5. Create a folder on the host machine where you will copy source videos to and collect transcoded videos from.
-6. Use the VirtualBox UI on the host machine to share this new folder with the VM.
-    1. Click the VM named "Tested Transcoder."
-    2. (Optional) Stop machine by using `vagrant halt` and adjust CPU / memory settings to suit. Once you have saved the changes start the machine again with `vagrant up`.
-    3. Click Shared folders.
-    4. Click the add button.
-    5. Find the folder you created in the "Folder Path" field.
-    6. The "Folder Name" *must* be "transcoder" or the script will not work.
-    7. Check the "Make Permanent" checkbox (may not be visible). Verify all other checkboxes are unchecked.
-    8. Click OK twice to return to the VM selection screen.
-8. Wait approximately a minute for 'input', 'output', 'work', and 'completed-originals' folders to be created in the folder on your host machine.
+ 1. clone this repository
+ 2. chmod +x install.sh
+ 3. put video files in /media/transcoder/input and wait :)
 
 ## Usage
 
-1. While the VM is running, starting your encodes is as easy as dragging a video from MakeMKV into the 'input' folder.
+1. Starting your encodes is as easy as dragging a video from MakeMKV into the 'input' folder.
 2. When the encode is in progress, you can check in on its progress by looking at the end of the log in the 'work' folder.
 3. When the encodes are complete, the new, better compressed video will be in the 'output' folder and the original source MKV will be in the 'completed-originals' folder. After you've confirmed subtitles and audio tracks are correct, you can safely delete the large original file.
 4. Enjoy your new, much smaller MKV in your favorite media player.
 
 ---
-#### Verify CPU Virtualization is on
-There may be better ways to do this, but this seems to be a reasonable way.
-
-1. Open VitrualBox Manager.
-2. Select New
-3. Name: test
-4. Next.
-5. Next.
-5. Do not add a virtual hard drive.
-6. Create.
-7. Click on the test VM and look under System for "Acceleration: VT-x/AMD-V, Nested Paging."
-8. If you see this message you should be good, otherwise you will need to Google how to turn it on for your specific motherboard.
-9. Once you are finished delete the test VM. (Right Click > Remove)

@@ -37,7 +37,7 @@ class Transcoder(object):
     # directory contained the compressed outputs
     OUTPUT_DIRECTORY = TRANSCODER_ROOT + '/output'
     # standard options for the transcode-video script
-    TRANSCODE_OPTIONS = '--quick --prefer-ac3 --add-subtitle all --main-audio eng --copy-audio 1'
+    TRANSCODE_OPTIONS = '--quick --no-auto-burn --prefer-ac3 --add-subtitle all --main-audio eng --copy-audio 1'
     # number of seconds a file must remain unmodified in the INPUT_DIRECTORY
     # before it is considered done copying. increase this value for more
     # tolerance on bad network connections.
@@ -283,32 +283,49 @@ class Transcoder(object):
             return None
         self.logger.info('Transcoding completed for input "%s"', name)
         return output
-
-    def parse_audio_tracks(self, meta):
-        "Parse the meta info for audio tracks beyond the first one"
-
-        # find all the audio streams and their optional language and title data
-        streams = []
-        stream_re = r'(\s{4}Stream #[0-9]+\.[0-9]+(?:\((?P<lang>[a-z]+)\))?: Audio:.*?\n)(?=(?:\s{4}Stream)|(?:[^\s]))'
-        title_re = r'^\s{6}title\s+:\s(?P<title>[^\n]+)'
-        for stream, lang in re.findall(stream_re, meta, re.DOTALL | re.MULTILINE):
-            lang = lang = ''
-            title = ''
-            title_match = re.search(title_re, stream, re.MULTILINE)
-            if title_match:
-                title = title_match.group(1)
-            streams.append({'title': title, 'lang': lang})
-
-        # find the audio track numbers
-        tracks = []
-        pos = meta.find('+ audio tracks:')
-        track_re = r'^\s+\+\s(?P<track>[0-9]+),\s(?P<title>[^\(\n]*)'
+    
+     def parse_subtitle_tracks(self, meta):
+        pos = meta.find('+ subtitle tracks:')
+        track_re = r'^\s+\+\s(?P<track>[0-9]+),\s(?P<language>[^\(\n]*)'
+        # language may be useful for some kind of filter
+        subtitle_tracks = []
         for line in meta[pos:].split('\n')[1:]:
-            if line.startswith('  + subtitle tracks:'):
+            if line.startswith('HandBrake'):
                 break
             match = re.match(track_re, line)
             if match:
+                self.logger.info('Adding subtitle track #%s (%s)',
+                                 match.group(1), match.group(2).rstrip())
+                subtitle_tracks.append('--add-subtitle %s' % (match.group(1)))
+        return ' '.join(subtitle_tracks)
+
+         def parse_audio_tracks(self, meta):
+         "Parse the meta info for audio tracks beyond the first one"
+ 
+         # find all the audio streams and their optional language and title data
+         streams = []
+         stream_re = r'(\s{4}Stream #[0-9]+\.[0-9]+(?:\((?P<lang>[a-z]+)\))?: Audio:.*?\n)(?=(?:\s{4}Stream)|(?:[^\s]))'
+         title_re = r'^\s{6}title\s+:\s(?P<title>[^\n]+)'
+         for stream, lang in re.findall(stream_re, meta, re.DOTALL | re.MULTILINE):
+             lang = lang = ''
+             title = ''
+             title_match = re.search(title_re, stream, re.MULTILINE)
+             if title_match:
+                 title = title_match.group(1)
+             streams.append({'title': title, 'lang': lang})
+ 
+         # find the audio track numbers
+         tracks = []
+         pos = meta.find('+ audio tracks:')
+         track_re = r'^\s+\+\s(?P<track>[0-9]+),\s(?P<title>[^\(\n]*)'
+         for line in meta[pos:].split('\n')[1:]:
+             if line.startswith('  + subtitle tracks:'):
+                 break
+             match = re.match(track_re, line)
+             if match:
                 tracks.append({'number': match.group(1), 'title': match.group(2)})
+                tracks.append({'number': match.group(1),
+                               'title': match.group(2).rstrip()})
 
         # assuming there's an equal number of tracks and streams, we can
         # match up stream titles to tracks and have a nicer output

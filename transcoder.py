@@ -267,7 +267,7 @@ class Transcoder(object):
         command_parts = [
             'transcode-video',
             '--crop %s' % crop,
-            self.parse_auio_tracks(meta),
+            self.parse_audio_tracks(meta),
             self.parse_subtitle_tracks(meta),
             self.TRANSCODE_OPTIONS,
             '--output "%s"' % output,

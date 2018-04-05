@@ -9,7 +9,7 @@ import signal
 import subprocess
 import sys
 import time
-
+from subprocess import call
 
 def non_zero_min(values):
     "Return the min value but always prefer non-zero values if they exist"
@@ -202,6 +202,7 @@ class Transcoder(object):
                                    os.path.basename(work_path))
         shutil.move(work_path, output_path)
         shutil.move(work_path + '.log', output_path + '.log')
+        os.system('query-handbrake-log time /media/transcoder/output/ | /bin/bash notify-rocketchat.sh')
 
     def scan_media(self, path):
         "Use handbrake to scan the media for metadata"

@@ -1,0 +1,12 @@
+[Unit]
+Description=Transcoder service
+
+[Service]
+ExecStart=/bin/tail -f /media/transcoder/transcoder.log | /bin/bash notify-rocketchat.sh
+Restart=on-failure
+RestartSec=5
+StartLimitInterval=400
+StartLimitBurst=2
+
+[Install]
+WantedBy=multi-user.target

@@ -30,7 +30,9 @@ chown -R $USER /media/transcoder
 echo "installing transcoder script and service.."
 cp transcoder.py /usr/local/bin/transcoder.py
 cp transcoder.service /etc/systemd/system/transcoder.service
+cp notify-rocketchat.sh /usr/local/bin/notify-rocketchat.sh
 chmod +x /usr/local/bin/transcoder.py
+chmod +x /usr/local/bin/notify-rocketchat.sh
 
 echo "enabling and starting services..."
 systemctl enable transcoder.service

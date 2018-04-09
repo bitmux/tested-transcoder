@@ -33,12 +33,16 @@ cp transcoder.service /etc/systemd/system/transcoder.service
 cp notify-rocketchat.sh /usr/local/bin/notify-rocketchat.sh
 chmod +x /usr/local/bin/transcoder.py
 chmod +x /usr/local/bin/notify-rocketchat.sh
+if [ ! -f /etc/notify-rocketchat.conf ] 
+  then
+  cp notify-rocketchat.conf /etc/notify-rocketchat.conf
+fi
 
 echo "enabling and starting services..."
 systemctl enable transcoder.service
 systemctl start transcoder.service
 while [ ! -f /media/transcoder/transcoder.log ]
-do
-sleep 1
-done 
+  do
+  sleep 1
+  done 
 tail -n1 /media/transcoder/transcoder.log

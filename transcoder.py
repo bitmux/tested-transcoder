@@ -37,7 +37,7 @@ class Transcoder(object):
     # directory contained the compressed outputs
     OUTPUT_DIRECTORY = TRANSCODER_ROOT + '/output'
     # standard options for the transcode-video script
-    TRANSCODE_OPTIONS = '--quick --prefer-ac3 --add-subtitle all --add-audio all'
+    TRANSCODE_OPTIONS = '--prefer-ac3 --add-subtitle all --add-audio all'
     # number of seconds a file must remain unmodified in the INPUT_DIRECTORY
     # before it is considered done copying. increase this value for more
     # tolerance on bad network connections.
@@ -201,8 +201,10 @@ class Transcoder(object):
         output_path = os.path.join(self.OUTPUT_DIRECTORY,
                                    os.path.basename(work_path))
         shutil.move(work_path, output_path)
+        os.system("query-handbrake-log time /media/transcoder/work | /bin/bash notify-rocketchat.sh")
         shutil.move(work_path + '.log', output_path + '.log')
-        os.system('query-handbrake-log time /media/transcoder/output/ | /bin/bash notify-rocketchat.sh')
+        outlog=(output_path + '.log')
+        #subprocess.call(["query-handbrake-log time", "/media/transcoder/output/", outlog])
 
     def scan_media(self, path):
         "Use handbrake to scan the media for metadata"

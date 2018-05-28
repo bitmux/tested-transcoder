@@ -176,7 +176,7 @@ class Transcoder(object):
     def process_input(self, path):
         name = os.path.basename(path)
         self.logger.info('Found new input "%s"', name)
-
+        #os.system('tail| /bin/bash notify-rocketchat.sh')
         # if any of the following functions return no output, something
         # bad happened and we can't continue
 

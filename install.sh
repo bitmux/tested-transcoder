@@ -17,7 +17,7 @@ echo "updating apt repository..."
 add-apt-repository ppa:stebbins/handbrake-releases
 apt update 
 echo "installing all kinds of stuff..." 
-apt install -y handbrake-cli mp4v2-utils mkvtoolnix ffmpeg ruby python git
+apt install -y handbrake-cli mp4v2-utils mkvtoolnix ffmpeg ruby python git samba samba-common-bin
 echo "installing Don Melton's scripts via ruby gem..."
 gem install video_transcoding
 echo "making lots of directories..."
@@ -47,3 +47,11 @@ while [ ! -f /media/transcoder/transcoder.log ]
   sleep 1
   done 
 tail -n1 /media/transcoder/transcoder.log
+
+echo "[public]
+
+comment = public share, no need to enter username and password
+path = /media/transcoder/
+browseable = yes
+writable = yes
+guest ok = yes" >> /etc/samba/smb.conf

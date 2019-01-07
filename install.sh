@@ -14,6 +14,7 @@ rm /media/transcoder/transcoder.log
 #git clone https://github.com/bitmux/video_transcoding.git ./tested-transcoder
 cd tested-transcoder
 echo "updating apt repository..."
+add-apt-repository ppa:stebbins/handbrake-releases
 apt update 
 echo "installing all kinds of stuff..." 
 apt install -y handbrake-cli mp4v2-utils mkvtoolnix ffmpeg ruby python git

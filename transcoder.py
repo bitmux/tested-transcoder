@@ -201,9 +201,9 @@ class Transcoder(object):
         output_path = os.path.join(self.OUTPUT_DIRECTORY,
                                    os.path.basename(work_path))
         shutil.move(work_path, output_path)
-        os.system("query-handbrake-log time /media/transcoder/work | /bin/bash notify-rocketchat.sh")
         shutil.move(work_path + '.log', output_path + '.log')
         outlog=(output_path + '.log')
+        os.system("query-handbrake-log time /media/transcoder/work | /bin/bash notify-rocketchat.sh")
         #subprocess.call(["query-handbrake-log time", "/media/transcoder/output/", outlog])
 
     def scan_media(self, path):

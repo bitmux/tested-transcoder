@@ -37,7 +37,7 @@ class Transcoder(object):
     # directory contained the compressed outputs
     OUTPUT_DIRECTORY = TRANSCODER_ROOT + '/output'
     # standard options for the transcode-video script
-    TRANSCODE_OPTIONS = '--prefer-ac3 --add-subtitle all --add-audio all --target 1080p=12000 --target 720p=6000 --target 480p=4000'
+    TRANSCODE_OPTIONS = '--prefer-ac3 --add-subtitle all --add-audio all --2160p=20000 --target 1080p=12000 --target 720p=6000 --target 480p=4000'
     # number of seconds a file must remain unmodified in the INPUT_DIRECTORY
     # before it is considered done copying. increase this value for more
     # tolerance on bad network connections.
@@ -164,6 +164,7 @@ class Transcoder(object):
                     f = open(path, 'r')
                     f.close()
                 except IOError:
+		    self.logger.info('IO error "%s"', f)
                     continue
 
                 self.process_input(path)
@@ -171,6 +172,7 @@ class Transcoder(object):
                 dst = os.path.join(self.COMPLETED_DIRECTORY,
                                    os.path.basename(path))
                 shutil.move(path, dst)
+		self.logger.info('Dumped out and moved "%s" to completed directory.', path)
                 break
 
     def process_input(self, path):

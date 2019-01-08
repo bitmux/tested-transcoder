@@ -14,6 +14,7 @@ rm /media/transcoder/transcoder.log
 #git clone https://github.com/bitmux/video_transcoding.git ./tested-transcoder
 cd tested-transcoder
 echo "updating apt repository..."
+apt install -y software-properties-common
 add-apt-repository ppa:stebbins/handbrake-releases
 apt update 
 echo "installing all kinds of stuff..." 
